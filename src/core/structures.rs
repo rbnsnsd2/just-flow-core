@@ -2,17 +2,14 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-// INPUT PAYLOAD
+///////////////////
+// INPUT PAYLOAD //
+///////////////////
 #[derive(Serialize, Deserialize)]
 pub struct FlowState {
     pub unique_id: String,
     pub state_transitions: Vec<Vec<State>>,
 }
-
-// #[derive(Serialize, Deserialize)]
-// pub struct State {
-//     pub state_param: Vec<Param>,
-// }
 
 #[derive(Serialize, Deserialize)]
 pub struct State {
@@ -20,7 +17,9 @@ pub struct State {
     pub param_value: String,
 }
 
-// OUTPUT PAYLOAD
+////////////////////
+// OUTPUT PAYLOAD //
+////////////////////
 #[derive(Serialize, Deserialize)]
 pub struct ActionState {
     pub unique_id: String,
@@ -28,38 +27,38 @@ pub struct ActionState {
 }
 
 impl fmt::Display for ActionState {
-    // fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    //     write!(f, "{:?}, {:?}", self.unique_id, self.action_transitions)
-    // }
-
+    #[allow(unused_variables)]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let json = serde_json::to_string(self);
         let json = match json {
             Ok(out) => out,
-            Err(error) => {
-                error!("error formatting actionstate: {:?}", error);
-                "empty string".to_string()
-            }
+            Err(error) => "empty string".to_string(),
         };
-        write!(f, "{:?}", json)
+        write!(f, "{}", json)
     }
 }
 
-pub fn output_state(output: ActionState) -> String {
-    debug!("output_state");
-    let json = serde_json::to_string(&output);
-    let json = match json {
-        Ok(out) => out,
-        Err(error) => {
-            error!(
-                "error from output: {:?} with error: {:?}",
-                &output.unique_id, error
-            );
-            panic!("Actonstate output conversion to json failed: {:?}", error);
+impl ActionState {
+    #[allow(dead_code)]
+    pub fn empty() -> ActionState {
+        ActionState {
+            unique_id: "test_empty".to_string(),
+            action_transitions: vec![vec![Actions {
+                action_key: "test_action_key".to_string(),
+                action_value: "test_action_value".to_string(),
+            }]],
         }
-    };
-    debug!("output json String: {:?}", json);
-    json
+    }
+
+    pub fn error(error_message: String) -> ActionState {
+        ActionState {
+            unique_id: error_message,
+            action_transitions: vec![vec![Actions {
+                action_key: "error_action_key".to_string(),
+                action_value: "error_action_value".to_string(),
+            }]],
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -68,7 +67,9 @@ pub struct Actions {
     pub action_value: String,
 }
 
-// CONFIG PAYLOAD
+////////////////////
+// CONFIG PAYLOAD //
+////////////////////
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     pub version_name: String,
@@ -88,7 +89,6 @@ pub struct ConditionMatches {
     pub match_type: String,
     pub match_condition_type: String,
     pub match_conditions: Vec<MatchCondition>,
-    // pub match_actions: Vec<MatchAction>,
     pub match_actions: Vec<Actions>,
     pub next_available_matches: Vec<String>,
 }
@@ -100,13 +100,6 @@ pub struct MatchCondition {
     pub param_type: String,
     pub param_match: String,
 }
-
-// #[derive(Serialize, Deserialize)]
-// pub struct MatchAction {
-//     pub action_name: String,
-//     pub action_type: String,
-//     pub action_value: String,
-// }
 
 #[derive(Serialize, Deserialize)]
 pub struct RouteName {

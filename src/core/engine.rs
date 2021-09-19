@@ -4,65 +4,97 @@ use std::collections::HashMap;
 use crate::core::structures::{
     ActionState, Actions, ConditionMatches, Config, FlowState, MatchCondition, RouteFlow, State,
 };
-use crate::tests::payloads::values::AVALUE;
+// use crate::testz::payloads::values::AVALUE;
 
 use log::{debug, error};
 
-pub fn engine_hello() {
-    // a function to say hello form src/core/engine.rs
-    debug!("engine_hello started");
-    println!("avalue here: {}", AVALUE);
-    println!("engine_hello from src/core/engine.rs");
-}
+// pub fn engine_hello() {
+//     // a function to say hello form src/core/engine.rs
+//     debug!("engine_hello started");
+//     println!("avalue here: {}", AVALUE);
+//     println!("engine_hello from src/core/engine.rs");
+// }
 
-pub fn load_flow_state(input: String) -> FlowState {
+pub fn load_flow_state(input: String) -> Result<FlowState, serde_json::Error> {
     debug!("load_flow_state");
+    // TODO needs to return ok/err
     let flow_state = serde_json::from_str(&input);
-    let flow_state = match flow_state {
-        Ok(flow) => flow,
-        Err(error) => {
-            error!("error from input: {:?} with error: {:?}", &input, &error);
-            panic!("Flow state is incorrectly formatted: {:?}", error);
-        }
-    };
+    // let flow_state = match flow_state {
+    //     Ok(flow) => flow,
+    //     Err(error) => {
+    //         error!("error from input: {:?} with error: {:?}", &input, &error);
+    //         panic!("Flow state is incorrectly formatted: {:?}", error);
+    //     }
+    // };
     flow_state
 }
 
-pub fn load_config(input: String) -> Config {
+pub fn load_config(input: String) -> Result<Config, serde_json::Error> {
     debug!("load_config");
+    // TODO needs to return ok/err
     let config = serde_json::from_str(&input);
-    let config = match config {
-        Ok(flow) => flow,
-        Err(error) => {
-            error!("error from config: {:?} with error: {:?}", &input, &error);
-            panic!("Config is incorrectly formatted: {:?}", error);
-        }
-    };
+    // let config = match config {
+    //     Ok(flow) => flow,
+    //     Err(error) => {
+    //         error!("error from config: {:?} with error: {:?}", &input, &error);
+    //         panic!("Config is incorrectly formatted: {:?}", error);
+    //     }
+    // };
     config
 }
 
-pub fn output_state(output: ActionState) -> String {
-    debug!("output_state");
-    let json = serde_json::to_string(&output);
-    let json = match json {
-        Ok(out) => out,
-        Err(error) => {
-            error!(
-                "error from output: {:?} with error: {:?}",
-                &output.unique_id, error
-            );
-            panic!("Actonstate output conversion to json failed: {:?}", error);
+pub fn process(config: String, input: String) -> String {
+    debug!("process called");
+    //
+    // if all is well process, otherwise return an
+    // error payload
+    //
+    let config = crate::core::engine::load_config(config);
+    let input = crate::core::engine::load_flow_state(input);
+
+    if config.is_ok() && input.is_ok() {
+        debug!(
+            "config & input are: {:?}/{:?} -> evaluating",
+            config.is_ok(),
+            input.is_ok()
+        );
+        let actions = evaluate(&config.unwrap(), input.unwrap());
+        if actions.is_err() {
+            return ActionState::error("error during evaluation".to_string()).to_string();
         }
-    };
-    debug!("output json String: {:?}", json);
-    json
+        let action: ActionState = ActionState {
+            unique_id: "some unique id".to_string(),
+            action_transitions: actions.unwrap(),
+        };
+        // "result".to_string();
+        action.to_string()
+    } else {
+        error!("config or input bad. returning error action");
+        if config.is_err() {
+            ActionState::error(
+                "Configuration file corrupted. See just-flow.example_configuration for an example."
+                    .to_string(),
+            )
+            .to_string()
+        } else if input.is_err() {
+            ActionState::error(
+                "Input state file corrupted. See just-flow.example_flow_state for an example."
+                    .to_string(),
+            )
+            .to_string()
+        } else {
+            ActionState::error("Here is the error message".to_string()).to_string()
+        }
+    }
 }
 
-pub fn evaluate(config: &Config, input: FlowState) -> Vec<Vec<Actions>> {
+pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, String> {
     debug!(
         "config: {:?}, flow: {:?}",
         config.version_name, input.unique_id
     );
+    // TODO needs to return ok/err
+
     //
     // ASSUMPTION -- non stateful, so need/expect to iter states
     //
@@ -150,7 +182,7 @@ pub fn evaluate(config: &Config, input: FlowState) -> Vec<Vec<Actions>> {
         } // end of stateloop
         debug!("action_transitions len: {:?}", action_transitions.len());
     } // end of flowrouteloop
-    action_transitions
+    Ok(action_transitions)
 }
 
 fn build_route_name_index(route: &RouteFlow) -> HashMap<String, usize> {

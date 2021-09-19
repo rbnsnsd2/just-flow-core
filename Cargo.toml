@@ -7,9 +7,27 @@ publish = false
 license = "all right reserved"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+
+[lib]
+name = "just_flow"
+# "cdylib" is necessary to produce a shared library for Python to import from.
+#
+# Downstream Rust code (including code in `bin/`, `examples/`, and `tests/`) will not be able
+# to `use string_sum;` unless the "rlib" or "lib" crate type is also included, e.g.:
+# crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib"]
+
 [dependencies]
 evalexpr = { version = "5.1.0", features = ["regex_support"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0.59"} 
 log = { version = "0.4" }
 env_logger = { version = "0.8.4" }
+
+[dependencies.pyo3]
+version = "0.14.5"
+features = ["extension-module"]

@@ -2,8 +2,8 @@
 mod tests {
     // use super::*;
     use crate::tests::payloads::values::{
-        ACTIONS, ACTIONSTATE, CONDITIONMATCHES, CONFIG, FLOW, FLOWSTATE, MATCHCONDITION, ROUTEFLOW,
-        STATE,
+        ACTIONS, ACTIONSTATE, BADCONFIG, BADFLOWSTATE, CONDITIONMATCHES, CONFIG, FLOW, FLOWSTATE,
+        MATCHCONDITION, ROUTEFLOW, STATE,
     };
     use log::debug;
 
@@ -70,14 +70,14 @@ mod tests {
     #[test]
     fn load_flow_state_from_string() {
         let flow: crate::core::structures::FlowState =
-            crate::core::engine::load_flow_state(FLOWSTATE.to_string());
+            crate::core::engine::load_flow_state(FLOWSTATE.to_string()).unwrap();
         print!("\nFlow version: {} loaded successfully", flow.unique_id);
     }
 
     #[test]
     fn load_config_from_string() {
         let route_flow: crate::core::structures::Config =
-            crate::core::engine::load_config(CONFIG.to_string());
+            crate::core::engine::load_config(CONFIG.to_string()).unwrap();
         println!("route flow: {:?}", route_flow.version_name);
     }
 
@@ -85,28 +85,73 @@ mod tests {
     fn output_state_from_action_state() {
         let action_state: crate::core::structures::ActionState =
             serde_json::from_str(ACTIONSTATE).expect("unable to convert");
-        let output: String = crate::core::engine::output_state(action_state);
+        let output: String = action_state.to_string();
+        // let output: String = crate::core::engine::output_state(action_state);
         println!("string from action state: {:?}", output);
     }
 
     #[test]
     fn main_equivalent() {
         let config: crate::core::structures::Config =
-            crate::core::engine::load_config(CONFIG.to_string());
+            crate::core::engine::load_config(CONFIG.to_string()).unwrap();
         let input: crate::core::structures::FlowState =
-            crate::core::engine::load_flow_state(FLOWSTATE.to_string());
+            crate::core::engine::load_flow_state(FLOWSTATE.to_string()).unwrap();
         //
         let actions = crate::core::engine::evaluate(&config, input);
-        let action: crate::core::structures::ActionState = crate::ActionState {
+        let action = crate::core::structures::ActionState {
             unique_id: "testid".to_string(),
-            action_transitions: actions,
+            action_transitions: actions.unwrap(),
         };
-        let action = crate::core::engine::output_state(action);
+        // let action = crate::core::engine::output_state(action);
+        let action = action.to_string();
         println!("action state result: {}", action);
 
         //
     }
 
+    ////////////////////
+    // error handling //
+    ////////////////////
+    #[test]
+    fn load_bad_flow_state_from_string() {
+        // let flow: crate::core::structures::FlowState =
+        //     crate::core::engine::load_flow_state(BADFLOWSTATE.to_string());
+        let flow = crate::core::engine::load_flow_state(BADFLOWSTATE.to_string());
+
+        assert!(flow.is_err() == true);
+        print!("\nBAD Flow version: {} failed elegantly", flow.is_err());
+    }
+
+    #[test]
+    fn load_bad_config_from_string() {
+        // let route_flow: crate::core::structures::Config =
+        //     crate::core::engine::load_config(BADCONFIG.to_string());
+        let route_flow = crate::core::engine::load_config(BADCONFIG.to_string());
+        assert!(route_flow.is_err() == true);
+        println!("BAD config: {:?}", route_flow.is_err());
+    }
+
+    #[test]
+    fn main_bad_config_equivalent() {
+        let output = crate::core::structures::ActionState::error(
+            "Configuration file corrupted. See just-flow.example_configuration for an example."
+                .to_string(),
+        )
+        .to_string();
+        let result = crate::core::engine::process(BADCONFIG.to_string(), FLOWSTATE.to_string());
+        assert!(result == output);
+    }
+
+    #[test]
+    fn main_bad_flow_equivalent() {
+        let result = crate::core::engine::process(CONFIG.to_string(), BADFLOWSTATE.to_string());
+        let output = crate::core::structures::ActionState::error(
+            "Input state file corrupted. See just-flow.example_flow_state for an example."
+                .to_string(),
+        )
+        .to_string();
+        assert!(result == output);
+    }
     //////////////////
     // end of tests //
     //////////////////

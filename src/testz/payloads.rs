@@ -281,12 +281,10 @@ pub mod values {
                         "match_actions": [
                             {
                                 "action_key": "dref_1",
-                                "action_type": "f64",
                                 "action_value": "190"
                             },
                             {
                                 "action_key": "dref_2",
-                                "action_type": "f64",
                                 "action_value": "5050"
                             }
                         ],
@@ -300,6 +298,118 @@ pub mod values {
 
 }"#;
 
-    //////////
-    // end of constants
+    ///////////////////
+    // bad constants //
+    ///////////////////
+
+    // missing unique_id
+    pub const BADFLOWSTATE: &str = r#"
+{
+    "state_transitions": [
+        [
+	    {
+		"param_name": "altitude",
+		"param_value": "5000"
+	    },
+	    {
+		"param_name": "airspeed",
+		"param_value": "320"
+	    }
+	],
+        [
+	    {
+		"param_name": "altitude",
+		"param_value": "5050"
+	    },
+	    {
+		"param_name": "airspeed",
+		"param_value": "321"
+	    }
+	]
+    ]
+}"#;
+
+    // missing match_key
+    pub const BADCONFIG: &str = r#"
+        {
+            "version_name": "version1",
+            "stateful": false,
+            "flow_routes": [
+                {
+                    "flow_route_name": "evaluate entire event flow",
+                    "flow_conditional_matches": [
+                        {
+                            "route_condition_name": "START",
+                            "match_type": "START",
+                            "match_condition_type": "ANY",
+                            "match_conditions": [
+                               {
+                                    "param_name": "$airspeed",
+                                    "param_type": "NUM",
+                                    "param_match": "$airspeed > 140"
+                               },
+                               {
+                                    "param_name": "$altitude",
+                                    "param_key": "altitude",
+                                    "param_type": "NUM",
+                                    "param_match": "$altitude > 1000"
+                               }
+                            ],
+                            "match_actions": [
+                                {
+                                    "action_key": "dref_1",
+                                    "action_type": "f64",
+                                    "action_value": "190"
+                                },
+                                {
+                                   "action_key": "dref_2",
+                                  "action_type": "f64",
+                                 "action_value": "5050"
+                                }
+                           ],
+                           "next_available_matches": [
+                               "takeoff_climb_1", "emergency_1"
+                           ]
+                    },
+                    {
+                        "route_condition_name": "takeoff_climb_1",
+                        "match_type": "EVAL",
+                        "match_condition_type": "ANY",
+                        "match_conditions": [
+                             {
+                                "param_name": "$airspeed",
+                                "param_key": "airspeed",
+                                "param_type": "NUM",
+                                "param_match": "$airspeed > 150"
+                             },
+                             {
+                                "param_name": "$altitude",
+                                "param_key": "altitude",
+                                "param_type": "NUM",
+                                "param_match": "$altitude > 2000"
+                             }
+                        ],
+                        "match_actions": [
+                            {
+                                "action_key": "dref_1",
+                                "action_value": "190"
+                            },
+                            {
+                                "action_key": "dref_2",
+                                "action_value": "5050"
+                            }
+                        ],
+                        "next_available_matches": [
+                            "takeoff_climb_2", "emergency_1"
+                        ]
+                    }
+                ]
+          }
+    ]
+
+}"#;
+
+    //////////////////////
+    // end of constants //
+    //////////////////////
 }
