@@ -2,8 +2,8 @@
 mod tests {
     // use super::*;
     use crate::tests::payloads::values::{
-        ACTIONS, ACTIONSTATE, CONDITIONMATCHES, CONFIG, FLOW, FLOWSTATE, MATCHACTION,
-        MATCHCONDITION, ROUTEFLOW, STATE,
+        ACTIONS, ACTIONSTATE, CONDITIONMATCHES, CONFIG, FLOW, FLOWSTATE, MATCHCONDITION, ROUTEFLOW,
+        STATE,
     };
     use log::debug;
 
@@ -45,13 +45,6 @@ mod tests {
         let match_condition: crate::core::structures::MatchCondition =
             serde_json::from_str(MATCHCONDITION).expect("unable to convert");
         println!("match_condition: {:?}", match_condition.param_name);
-    }
-
-    #[test]
-    fn config_match_action() {
-        let match_action: crate::core::structures::MatchAction =
-            serde_json::from_str(MATCHACTION).expect("unable to convert");
-        println!("match_condition: {:?}", match_action.action_name);
     }
 
     #[test]
@@ -103,7 +96,13 @@ mod tests {
         let input: crate::core::structures::FlowState =
             crate::core::engine::load_flow_state(FLOWSTATE.to_string());
         //
-        crate::core::engine::evaluate(config, input);
+        let actions = crate::core::engine::evaluate(&config, input);
+        let action: crate::core::structures::ActionState = crate::ActionState {
+            unique_id: "testid".to_string(),
+            action_transitions: actions,
+        };
+        let action = crate::core::engine::output_state(action);
+        println!("action state result: {}", action);
 
         //
     }

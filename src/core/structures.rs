@@ -1,5 +1,6 @@
 //src/core/structures.rs
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 // INPUT PAYLOAD
 #[derive(Serialize, Deserialize)]
@@ -26,7 +27,42 @@ pub struct ActionState {
     pub action_transitions: Vec<Vec<Actions>>,
 }
 
-#[derive(Serialize, Deserialize)]
+impl fmt::Display for ActionState {
+    // fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    //     write!(f, "{:?}, {:?}", self.unique_id, self.action_transitions)
+    // }
+
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let json = serde_json::to_string(self);
+        let json = match json {
+            Ok(out) => out,
+            Err(error) => {
+                error!("error formatting actionstate: {:?}", error);
+                "empty string".to_string()
+            }
+        };
+        write!(f, "{:?}", json)
+    }
+}
+
+pub fn output_state(output: ActionState) -> String {
+    debug!("output_state");
+    let json = serde_json::to_string(&output);
+    let json = match json {
+        Ok(out) => out,
+        Err(error) => {
+            error!(
+                "error from output: {:?} with error: {:?}",
+                &output.unique_id, error
+            );
+            panic!("Actonstate output conversion to json failed: {:?}", error);
+        }
+    };
+    debug!("output json String: {:?}", json);
+    json
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Actions {
     pub action_key: String,
     pub action_value: String,
@@ -52,7 +88,8 @@ pub struct ConditionMatches {
     pub match_type: String,
     pub match_condition_type: String,
     pub match_conditions: Vec<MatchCondition>,
-    pub match_actions: Vec<MatchAction>,
+    // pub match_actions: Vec<MatchAction>,
+    pub match_actions: Vec<Actions>,
     pub next_available_matches: Vec<String>,
 }
 
@@ -64,12 +101,12 @@ pub struct MatchCondition {
     pub param_match: String,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct MatchAction {
-    pub action_name: String,
-    pub action_type: String,
-    pub action_value: String,
-}
+// #[derive(Serialize, Deserialize)]
+// pub struct MatchAction {
+//     pub action_name: String,
+//     pub action_type: String,
+//     pub action_value: String,
+// }
 
 #[derive(Serialize, Deserialize)]
 pub struct RouteName {

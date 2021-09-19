@@ -80,17 +80,9 @@ pub mod values {
          }
         "#;
 
-    pub const MATCHACTION: &str = r#"
-         {
-            "action_name": "dref",
-            "action_type": "f64",
-            "action_value": "150"
-         }
-        "#;
-
     pub const CONDITIONMATCHES: &str = r#"
         {
-            "route_condition_name": "takeoff_1",
+            "route_condition_name": "START",
             "match_type": "START",
             "match_condition_type": "ANY",
             "match_conditions": [
@@ -109,12 +101,12 @@ pub mod values {
             ],
             "match_actions": [
                 {
-                    "action_name": "dref_1",
+                    "action_key": "dref_1",
                     "action_type": "f64",
                     "action_value": "190"
                 },
                 {
-                    "action_name": "dref_2",
+                    "action_key": "dref_2",
                     "action_type": "f64",
                     "action_value": "5050"
                 }
@@ -148,12 +140,12 @@ pub mod values {
                     ],
                     "match_actions": [
                         {
-                            "action_name": "dref_1",
+                            "action_key": "dref_1",
                             "action_type": "f64",
                             "action_value": "190"
                         },
                         {
-                            "action_name": "dref_2",
+                            "action_key": "dref_2",
                             "action_type": "f64",
                             "action_value": "5050"
                         }
@@ -182,12 +174,12 @@ pub mod values {
                     ],
                     "match_actions": [
                         {
-                            "action_name": "dref_1",
+                            "action_key": "dref_1",
                             "action_type": "f64",
                             "action_value": "190"
                         },
                         {
-                            "action_name": "dref_2",
+                            "action_key": "dref_2",
                             "action_type": "f64",
                             "action_value": "5050"
                         }
@@ -235,7 +227,7 @@ pub mod values {
                     "flow_route_name": "evaluate entire event flow",
                     "flow_conditional_matches": [
                         {
-                            "route_condition_name": "takeoff_1",
+                            "route_condition_name": "START",
                             "match_type": "START",
                             "match_condition_type": "ANY",
                             "match_conditions": [
@@ -254,12 +246,12 @@ pub mod values {
                             ],
                             "match_actions": [
                                 {
-                                    "action_name": "dref_1",
+                                    "action_key": "dref_1",
                                     "action_type": "f64",
                                     "action_value": "190"
                                 },
                                 {
-                                   "action_name": "dref_2",
+                                   "action_key": "dref_2",
                                   "action_type": "f64",
                                  "action_value": "5050"
                                 }
@@ -288,12 +280,12 @@ pub mod values {
                         ],
                         "match_actions": [
                             {
-                                "action_name": "dref_1",
+                                "action_key": "dref_1",
                                 "action_type": "f64",
                                 "action_value": "190"
                             },
                             {
-                                "action_name": "dref_2",
+                                "action_key": "dref_2",
                                 "action_type": "f64",
                                 "action_value": "5050"
                             }

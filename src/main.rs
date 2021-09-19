@@ -6,6 +6,7 @@ use std::env;
 mod core;
 mod tests;
 
+use crate::core::structures::ActionState;
 use crate::tests::payloads::values::{CONFIG, FLOWSTATE};
 
 fn main() {
@@ -22,7 +23,13 @@ fn main() {
     let input: crate::core::structures::FlowState =
         crate::core::engine::load_flow_state(FLOWSTATE.to_string());
     //
-    crate::core::engine::evaluate(config, input);
+    let actions = crate::core::engine::evaluate(&config, input);
+    let action: ActionState = ActionState {
+        unique_id: "something".to_string(),
+        action_transitions: actions,
+    };
+
+    println!("{}", action.to_string());
 
     // stop doing stuff
 }
