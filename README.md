@@ -1,5 +1,8 @@
 ## Input
 Where stateful=true uniqueGroupId may be none.
+```shell
+on Linux, rename libyour_module.so to your_module.so.
+```
 
 ```java
 {

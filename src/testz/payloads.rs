@@ -3,8 +3,27 @@ pub mod values {
     pub const AVALUE: &str = "a test string";
 
     pub const HELP: &str = r#"
-Just-flow 
-2021 Fraign Analytics LLC    
+Just-flow-core © 2022 
+Fraign Analytics LLC
+222 S Meramec Ave.,
+St. Louis, MO
+63105 USA
+
+The just-flow-core is a Python binary module for fast execution of automata on 
+sequential state data. In order to .process() & evaluate the automata, it 
+requires a String describing the automata config and a String decribing the 
+"flow" or sequence of states. Examples of these Strings and their required 
+format can be found by calling .example_configuration() & .example_flow().
+
+With this approach a wide variety of data can be evaluated and appropriate 
+resulting action returned. One example would be the evaluation of what stage
+of flight an aircraft is currently in and what instructions should be passed 
+back to the aicraft/simulator/pilot as the next actions. This could be 
+identifying that the aircraft is on the descent to land and returning the before
+landing checklist to the pilot. Determining the next action requires knowledge 
+of the prior actions--hence the need for an automata.
+
+
 
     "#;
 

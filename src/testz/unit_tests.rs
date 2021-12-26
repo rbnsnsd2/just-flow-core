@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     // use super::*;
-    use crate::tests::payloads::values::{
+    use crate::testz::payloads::values::{
         ACTIONS, ACTIONSTATE, BADCONFIG, BADFLOWSTATE, CONDITIONMATCHES, CONFIG, FLOW, FLOWSTATE,
         MATCHCONDITION, ROUTEFLOW, STATE,
     };

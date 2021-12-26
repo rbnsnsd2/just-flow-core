@@ -109,7 +109,7 @@ checksum = "b71991ff56294aa922b450139ee08b3bfc70982c6b2c7562771375cf73542dd4"
 
 [[package]]
 name = "just-flow"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "env_logger",
  "evalexpr",
