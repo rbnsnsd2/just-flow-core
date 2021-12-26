@@ -2,6 +2,12 @@
 pub mod values {
     pub const AVALUE: &str = "a test string";
 
+    pub const HELP: &str = r#"
+Just-flow 
+2021 Fraign Analytics LLC    
+
+    "#;
+
     pub const STATE: &str = r#"
 	    {
 		"param_name": "airspeed",

@@ -7,10 +7,13 @@ publish = false
 license = "all right reserved"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[profile.release]
-opt-level = "s"
-lto = true
-codegen-units = 1
+
+[target.x86_64-unknown-linux-musl]
+
+# [profile.release]
+# opt-level = "s"
+# lto = true
+# codegen-units = 1
 
 [lib]
 name = "just_flow"
