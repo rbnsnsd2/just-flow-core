@@ -3,12 +3,17 @@ use pyo3::prelude::*;
 
 mod core;
 mod testz;
-use testz::payloads::values::{CONFIG, FLOWSTATE, HELP};
+use testz::payloads::values::{CONFIG, FLOWSTATE, HELP, VERSION};
 
 /// Formats the sum of two numbers as string.
 #[pyfunction]
 fn process(config: String, flow: String) -> PyResult<String> {
     Ok(core::engine::process(config, flow))
+}
+
+#[pyfunction]
+fn version() -> PyResult<String> {
+    Ok(VERSION.to_string())
 }
 
 #[pyfunction]
@@ -41,6 +46,7 @@ fn just_flow(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(example_flow_state, m)?)?;
     m.add_function(wrap_pyfunction!(hello, m)?)?;
     m.add_function(wrap_pyfunction!(help, m)?)?;
+    m.add_function(wrap_pyfunction!(version, m)?)?;
 
     Ok(())
 }
