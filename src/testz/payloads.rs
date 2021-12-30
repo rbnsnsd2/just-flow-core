@@ -175,6 +175,10 @@ H        420    1500   2500   1500   600
     ]
 }
 
+Config notes:
+"stateful" is currently only accepted as "false". Note that this should be 
+passed as a correctly formatted json, so this is not False or "False" (in quotes).
+When using python: json.dumps('{"stateful": False}') returns the correct result.
 
     "#;
 
@@ -363,7 +367,7 @@ H        420    1500   2500   1500   600
 
     pub const FLOWSTATE: &str = r#"
 {
-    "unique_id": "some_uid",
+    "unique_id": "some_uid 123",
     "state_transitions": [
         [
 	    {
@@ -371,8 +375,12 @@ H        420    1500   2500   1500   600
 		"param_value": "5000"
 	    },
 	    {
-		"param_name": "airspeed",
+		"param_name": "airspeed1",
 		"param_value": "320"
+	    },
+	    {
+		"param_name": "message",
+		"param_value": "some message here"
 	    }
 	],
         [
@@ -390,7 +398,7 @@ H        420    1500   2500   1500   600
 
     pub const CONFIG: &str = r#"
         {
-            "version_name": "version1",
+            "version_name": "version2",
             "stateful": false,
             "flow_routes": [
                 {
@@ -420,6 +428,10 @@ H        420    1500   2500   1500   600
                                     "action_value": "190"
                                 },
                                 {
+                                    "action_key": "message",
+                                    "action_value": "this action should be triggered"
+                                },
+                                {
                                     "action_key": "dref_2",
                                     "action_value": "5050"
                                 }
@@ -437,7 +449,7 @@ H        420    1500   2500   1500   600
                                 "param_name": "$airspeed",
                                 "param_key": "airspeed",
                                 "param_type": "NUM",
-                                "param_match": "$airspeed > 150"
+                                "param_match": "$airspeed > 500"
                              },
                              {
                                 "param_name": "$altitude",
@@ -452,12 +464,44 @@ H        420    1500   2500   1500   600
                                 "action_value": "190"
                             },
                             {
-                                "action_key": "dref_2",
-                                "action_value": "5050"
+                                "action_key": "message",
+                                "action_value": "this action should NOT be triggered!"
                             }
                         ],
                         "next_available_matches": [
                             "takeoff_climb_2", "emergency_1"
+                        ]
+                    },
+                    {
+                        "route_condition_name": "takeoff_climb_2",
+                        "match_type": "EVAL",
+                        "match_condition_type": "ANY",
+                        "match_conditions": [
+                             {
+                                "param_name": "$airspeed",
+                                "param_key": "airspeed",
+                                "param_type": "NUM",
+                                "param_match": "$airspeed > 500"
+                             },
+                             {
+                                "param_name": "$altitude",
+                                "param_key": "altitude",
+                                "param_type": "NUM",
+                                "param_match": "$altitude > 2000"
+                             }
+                        ],
+                        "match_actions": [
+                            {
+                                "action_key": "dref_1",
+                                "action_value": "190"
+                            },
+                            {
+                                "action_key": "message",
+                                "action_value": "this action should NOT be triggered!"
+                            }
+                        ],
+                        "next_available_matches": [
+                            "END", "emergency_1"
                         ]
                     }
                 ]

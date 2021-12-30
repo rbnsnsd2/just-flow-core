@@ -20,6 +20,6 @@ fn main() {
 
     let result = crate::core::engine::process(CONFIG.to_string(), FLOWSTATE.to_string());
     println!("\nresult: {}", result);
-    println!("\n{}", CONFIG.to_string());
+    // println!("\n{}", CONFIG.to_string());
     // stop doing stuff
 }

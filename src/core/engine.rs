@@ -58,12 +58,15 @@ pub fn process(config: String, input: String) -> String {
             config.is_ok(),
             input.is_ok()
         );
-        let actions = evaluate(&config.unwrap(), input.unwrap());
+        let uinput = input.unwrap();
+        let uid = uinput.unique_id.clone();
+        let actions = evaluate(&config.unwrap(), uinput);
+        // let actions = evaluate(&config.unwrap(), input.unwrap());
         if actions.is_err() {
             return ActionState::error("error during evaluation".to_string()).to_string();
         }
         let action: ActionState = ActionState {
-            unique_id: "some unique id".to_string(),
+            unique_id: uid,
             action_transitions: actions.unwrap(),
         };
         // "result".to_string();
@@ -178,7 +181,10 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
                 };
             } // end of routeloop
             debug!("action_state len: {:?}", action_state.len());
-            action_transitions.push(action_state);
+            // don't add a vector unless there is a non-zero
+            if action_state.len() >= 1 {
+                action_transitions.push(action_state);
+            };
         } // end of stateloop
         debug!("action_transitions len: {:?}", action_transitions.len());
     } // end of flowrouteloop
@@ -215,8 +221,22 @@ fn eval_condition_all(conditions: &ConditionMatches, states: &Vec<State>) -> boo
             if param.param_name == cond.param_key {
                 debug!("\tparam key match!");
                 bool_results.push(eval_num_string_expression(&cond, &param.param_value));
+            } else {
+                debug!(
+                    "\tparam key: {:?} != {:?}",
+                    param.param_name, cond.param_key
+                );
             }
         }
+    }
+    debug!(
+        "match_conditions len: {:?} > bool_results len {:?}",
+        conditions.match_conditions.len(),
+        bool_results.len()
+    );
+    if conditions.match_conditions.len() > bool_results.len() {
+        debug!("\tmatch_conditions short than bool_results: adding false");
+        bool_results.push(false);
     }
     debug!("eval_flow bool_results: {:?}", bool_results);
     let result = eval_bool_results_all(bool_results);
