@@ -278,12 +278,10 @@ H        420    1500   2500   1500   600
             "match_actions": [
                 {
                     "action_key": "dref_1",
-                    "action_type": "f64",
                     "action_value": "190"
                 },
                 {
                     "action_key": "dref_2",
-                    "action_type": "f64",
                     "action_value": "5050"
                 }
             ],
@@ -317,12 +315,10 @@ H        420    1500   2500   1500   600
                     "match_actions": [
                         {
                             "action_key": "dref_1",
-                            "action_type": "f64",
                             "action_value": "190"
                         },
                         {
                             "action_key": "dref_2",
-                            "action_type": "f64",
                             "action_value": "5050"
                         }
                     ],
@@ -351,12 +347,10 @@ H        420    1500   2500   1500   600
                     "match_actions": [
                         {
                             "action_key": "dref_1",
-                            "action_type": "f64",
                             "action_value": "190"
                         },
                         {
                             "action_key": "dref_2",
-                            "action_type": "f64",
                             "action_value": "5050"
                         }
                     ],
@@ -423,13 +417,11 @@ H        420    1500   2500   1500   600
                             "match_actions": [
                                 {
                                     "action_key": "dref_1",
-                                    "action_type": "f64",
                                     "action_value": "190"
                                 },
                                 {
-                                   "action_key": "dref_2",
-                                  "action_type": "f64",
-                                 "action_value": "5050"
+                                    "action_key": "dref_2",
+                                    "action_value": "5050"
                                 }
                            ],
                            "next_available_matches": [
