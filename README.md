@@ -1,3 +1,11 @@
+# Just-flow core
+
+## How to build with docker
+Set the version of the official Rust docker that you need. Start from the working directory with Cargo.toml.
+```shell
+sudo docker run --rm --user "$(id -u)":"$(id -g)" -v "$PWD":/just-flow -w /just-flow rust:1.50.0 cargo build --release
+```
+
 ## Input
 Where stateful=true uniqueGroupId may be none.
 ```shell
