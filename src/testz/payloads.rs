@@ -375,7 +375,7 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
 		"param_value": "5000"
 	    },
 	    {
-		"param_name": "airspeed1",
+		"param_name": "airspeed",
 		"param_value": "320"
 	    },
 	    {
@@ -391,7 +391,11 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
 	    {
 		"param_name": "airspeed",
 		"param_value": "321"
-	    }
+	    },
+            {
+                "param_name": "message",
+                "param_value": "here here here"
+            }
 	]
     ]
 }"#;
@@ -402,7 +406,7 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
             "stateful": false,
             "flow_routes": [
                 {
-                    "flow_route_name": "evaluate entire event flow",
+                    "flow_route_name": "first flow route",
                     "flow_conditional_matches": [
                         {
                             "route_condition_name": "START",
@@ -413,13 +417,13 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                                     "param_name": "$airspeed",
                                     "param_key": "airspeed",
                                     "param_type": "NUM",
-                                    "param_match": "$airspeed > 140"
+                                    "param_match": "NUM > 140"
                                },
                                {
                                     "param_name": "$altitude",
                                     "param_key": "altitude",
                                     "param_type": "NUM",
-                                    "param_match": "$altitude > 1000"
+                                    "param_match": "NUM > 1000"
                                }
                             ],
                             "match_actions": [
@@ -429,11 +433,7 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                                 },
                                 {
                                     "action_key": "message",
-                                    "action_value": "this action should be triggered"
-                                },
-                                {
-                                    "action_key": "dref_2",
-                                    "action_value": "5050"
+                                    "action_value": "this action should be triggered by the example flow"
                                 }
                            ],
                            "next_available_matches": [
@@ -449,27 +449,39 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                                 "param_name": "$airspeed",
                                 "param_key": "airspeed",
                                 "param_type": "NUM",
-                                "param_match": "$airspeed > 500"
-                             },
-                             {
-                                "param_name": "$altitude",
-                                "param_key": "altitude",
-                                "param_type": "NUM",
-                                "param_match": "$altitude > 2000"
+                                "param_match": "NUM > 1500"
                              }
                         ],
                         "match_actions": [
                             {
-                                "action_key": "dref_1",
-                                "action_value": "190"
-                            },
-                            {
-                                "action_key": "message",
-                                "action_value": "this action should NOT be triggered!"
+                                "action_key": "action_message",
+                                "action_value": "this action should NOT be triggered! 1500kts is fast!"
                             }
                         ],
                         "next_available_matches": [
                             "takeoff_climb_2", "emergency_1"
+                        ]
+                    },
+                    {
+                        "route_condition_name": "emergency_1",
+                        "match_type": "EVAL",
+                        "match_condition_type": "ANY",
+                        "match_conditions": [
+                             {
+                                "param_name": "$message",
+                                "param_key": "message",
+                                "param_type": "STRING",
+                                "param_match": "here"
+                             }
+                        ],
+                        "match_actions": [
+                            {
+                                "action_key": "message",
+                                "action_value": "this action should be triggered if the flow contains a message with  'here' in it."
+                            }
+                        ],
+                        "next_available_matches": [
+                            "END"
                         ]
                     },
                     {

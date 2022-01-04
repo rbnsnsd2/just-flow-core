@@ -108,8 +108,8 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
     // This is the actions that result from evaluating all states given
     let mut action_transitions = Vec::<Vec<Actions>>::new();
 
-    for route in config.flow_routes.iter() {
-        debug!(">flow_route_name: {:?}", route.flow_route_name);
+    for (r, route) in config.flow_routes.iter().enumerate() {
+        debug!(">{:?} flow_route_name: {:?}", r, route.flow_route_name);
         //
         // For each flow we need to iter through the states,
         // but only evaluate those conditional routes defined
@@ -120,15 +120,15 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
         let route_name_index = build_route_name_index(route);
         let mut routes_to_eval = vec!["START".to_string()];
 
-        for state in input.state_transitions.iter() {
+        for (s, state) in input.state_transitions.iter().enumerate() {
             debug!(
-                ">>state[0] being evaluated: {:?} against routes: {:?}",
-                state[0].param_name, routes_to_eval
+                ">{:?}>{:?} state[0]={:?} being evaluated against routes: {:?}",
+                r, s, state[0].param_name, routes_to_eval
             );
             let mut action_state = Vec::<Actions>::new();
 
-            'routeloop: for eval_route in routes_to_eval.iter() {
-                debug!(">>>routeloop: {:?}", eval_route);
+            'routeloop: for (e, eval_route) in routes_to_eval.iter().enumerate() {
+                debug!(">{:?}>{:?}>{:?} routeloop: {:?}", r, s, e, eval_route);
                 let index = route_name_index.get(&eval_route.to_string());
 
                 let result = match index {
@@ -155,7 +155,7 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
                     'poproutesloop: loop {
                         routes_to_eval.pop();
                         if routes_to_eval.len() == 0 {
-                            debug!("break from poproutesloop");
+                            debug!("<{:?}<{:?}<{:?} break from poproutesloop", r, s, e);
                             break 'poproutesloop;
                         }
                     }
@@ -168,7 +168,7 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
                         for fill_route in
                             &route.flow_conditional_matches[ind].next_available_matches
                         {
-                            debug!(">>>>fill next matches: {:?}", fill_route);
+                            debug!(">>>> fill next matches: {:?}", fill_route);
                             routes_to_eval.push(fill_route.to_string())
                         }
                     } else {
@@ -176,7 +176,7 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
                             debug!("\tno route_to_eval update");
                         }
                     }
-                    debug!("break state loop");
+                    debug!("<{:?}<{:?} break state loop", r, s);
                     break 'routeloop;
                 };
             } // end of routeloop
@@ -212,10 +212,7 @@ fn eval_condition_all(conditions: &ConditionMatches, states: &Vec<State>) -> boo
     //
     let mut bool_results = Vec::<bool>::new();
     for cond in conditions.match_conditions.iter() {
-        debug!(
-            "match_key: {:?}, match_cond: {:?}",
-            cond.param_key, cond.param_match
-        );
+        debug!("match_cond: {:?}", cond.param_match);
         for param in states.iter() {
             debug!("\tparams: {:?}/{:?}", param.param_name, param.param_value);
             if param.param_name == cond.param_key {
@@ -258,13 +255,13 @@ fn eval_num_string_expression(cond: &MatchCondition, value: &String) -> bool {
     //
 
     if cond.param_type == "STRING" {
-        eval_string_expression(value, &cond.param_name, &cond.param_match)
+        eval_string_expression(value, &cond.param_match)
     } else if cond.param_type == "NUM" {
         let value = value.parse::<f64>();
         match value {
             Ok(val) => {
                 debug!("\tmatch value: {:?}", val);
-                let _bool = eval_num_expression(val, &cond.param_name, &cond.param_match);
+                let _bool = eval_num_expression(val, &cond.param_match);
                 debug!("\t\tbool_result: {:?}", _bool);
                 _bool
             }
@@ -285,22 +282,15 @@ fn eval_num_string_expression(cond: &MatchCondition, value: &String) -> bool {
     }
 }
 
-fn eval_string_expression(value: &String, key: &String, expr: &String) -> bool {
+fn eval_string_expression(value: &String, expr: &String) -> bool {
     debug!("\t\teval_string_expression: {:?}", expr);
     // let key = "$string";
-    let _val = value.to_string();
-    let context = evalexpr::context_map! {key => _val};
-    debug!("\t\tcontext: {:?}", context);
+    let bool_val = evalexpr::eval(
+        &"str::regex_matches(\"~~\", \"||\")"
+            .replace("~~", &value)
+            .replace("||", &expr),
+    );
 
-    let context = match context {
-        Ok(cont) => cont,
-        Err(error) => {
-            error!("failed to extract the context map: {:?}", error);
-            let cont = evalexpr::context_map! {key => "NULL"};
-            cont.unwrap() // TODO
-        }
-    };
-    let bool_val = evalexpr::eval_with_context(expr, &context);
     let bool_result = match bool_val {
         Ok(val) => val.as_boolean().unwrap(), // TODO
         Err(error) => {
@@ -312,20 +302,12 @@ fn eval_string_expression(value: &String, key: &String, expr: &String) -> bool {
     bool_result
 }
 
-fn eval_num_expression(value: f64, key: &String, expr: &String) -> bool {
+fn eval_num_expression(value: f64, expr: &String) -> bool {
     debug!("\t\teval_num_expression: {:?}", expr);
-    let context = evalexpr::context_map! {key => value};
-    debug!("\tcontext: {:?}", context);
 
-    let context = match context {
-        Ok(cont) => cont,
-        Err(error) => {
-            error!("failed to extract the context map: {:?}", error);
-            let cont = evalexpr::context_map! {key => 5};
-            cont.unwrap() // TODO
-        }
-    };
-    let bool_val = evalexpr::eval_with_context(expr, &context);
+    let bool_val = evalexpr::eval(&expr.replace("NUM", &value.to_string()));
+    debug!("bool={:?}", bool_val);
+
     let bool_result = match bool_val {
         Ok(val) => val.as_boolean().unwrap(), // TODO
         Err(error) => {
