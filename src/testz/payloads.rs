@@ -70,27 +70,23 @@ actions for each automata. An automata defining the first two of these states
                     "match_condition_type": "ANY",
                     "match_conditions": [
                         {
-                            "param_name": "$A",
                             "param_key": "A",
                             "param_type": "NUM",
-                            "param_match": "$airspeed = 0"
+                            "param_match": "NUM = 0"
                         },
                         {
-                            "param_name": "$H",
                             "param_key": "H",
                             "param_type": "NUM",
-                            "param_match": "$H = 420"
+                            "param_match": "NUM = 420"
                         }
                     ],
                     "match_actions": [
                         {
                             "action_key": "FS",
-                            "action_type": "f64",
                             "action_value": "startup"
                         },
                         {
                             "action_key": "CL",
-                            "action_type": "f64",
                             "action_value": "before taxi"
                         }
                     ],
@@ -104,16 +100,14 @@ actions for each automata. An automata defining the first two of these states
                    "match_condition_type": "ANY",
                    "match_conditions": [
                        {
-                           "param_name": "$A",
                            "param_key": "A",
                            "param_type": "NUM",
-                           "param_match": "$airspeed > 120"
+                           "param_match": "NUM > 120"
                        },
                        {
-                           "param_name": "$H",
                            "param_key": "H",
                            "param_type": "NUM",
-                           "param_match": "$H > 820"
+                           "param_match": "NUM > 820"
                         }
                    ],
                    "match_actions": [
@@ -144,31 +138,31 @@ H        420    1500   2500   1500   600
     "state_transitions": [
         [
 	    {
-		"param_name": "A",
+		"param_key": "A",
 		"param_value": "0"
 	    },
 	    {
-		"param_name": "H",
+		"param_key": "H",
 		"param_value": "420"
 	    }
 	],
         [
 	    {
-		"param_name": "A",
+		"param_key": "A",
 		"param_value": "150"
 	    },
 	    {
-		"param_name": "H",
+		"param_key": "H",
 		"param_value": "1500"
 	    }
 	],
         [
 	    {
-		"param_name": "A",
+		"param_key": "A",
 		"param_value": "250"
 	    },
 	    {
-		"param_name": "H",
+		"param_key": "H",
 		"param_value": "2500"
 	    }
 	]
@@ -184,7 +178,7 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
 
     pub const STATE: &str = r#"
 	    {
-		"param_name": "airspeed",
+		"param_key": "airspeed",
 		"param_value": "val"
 	    }
         "#;
@@ -195,21 +189,21 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
     "state_transitions": [
         [
 	    {
-		"param_name": "altitude",
+		"param_key": "altitude",
 		"param_value": "5000"
 	    },
 	    {
-		"param_name": "airspeed",
+		"param_key": "airspeed",
 		"param_value": "320"
 	    }
 	],
         [
 	    {
-		"param_name": "altitude",
+		"param_key": "altitude",
 		"param_value": "5050"
 	    },
 	    {
-		"param_name": "airspeed",
+		"param_key": "airspeed",
 		"param_value": "321"
 	    }
 	]
@@ -253,7 +247,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
 
     pub const MATCHCONDITION: &str = r#"
          {
-            "param_name": "$airspeed",
             "param_key": "airspeed",
             "param_type": "NUM",
             "param_match": "$airspeed > 150"
@@ -267,16 +260,14 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
             "match_condition_type": "ANY",
             "match_conditions": [
                 {
-                    "param_name": "$airspeed",
                     "param_key": "airspeed",
                     "param_type": "NUM",
-                    "param_match": "$airspeed > 140"
+                    "param_match": "NUM > 140"
                 },
                 {
-                    "param_name": "$altitude",
                     "param_key": "altitude",
                     "param_type": "NUM",
-                    "param_match": "$altitude > 1000"
+                    "param_match": "NUM > 1000"
                 }
             ],
             "match_actions": [
@@ -304,13 +295,11 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                     "match_condition_type": "ANY",
                     "match_conditions": [
                         {
-                            "param_name": "$airspeed",
                             "param_key": "airspeed",
                             "param_type": "NUM",
                             "param_match": "$airspeed > 140"
                         },
                         {
-                        "param_name": "$altitude",
                         "param_key": "altitude",
                         "param_type": "NUM",
                         "param_match": "$altitude > 1000"
@@ -336,13 +325,11 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                     "match_condition_type": "ANY",
                     "match_conditions": [
                         {
-                            "param_name": "$airspeed",
                             "param_key": "airspeed",
                             "param_type": "NUM",
                             "param_match": "$airspeed > 150"
                         },
                         {
-                        "param_name": "$altitude",
                         "param_key": "altitude",
                         "param_type": "NUM",
                         "param_match": "$altitude > 2000"
@@ -371,29 +358,29 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
     "state_transitions": [
         [
 	    {
-		"param_name": "altitude",
+		"param_key": "altitude",
 		"param_value": "5000"
 	    },
 	    {
-		"param_name": "airspeed",
+		"param_key": "airspeed",
 		"param_value": "320"
 	    },
 	    {
-		"param_name": "message",
+		"param_key": "message",
 		"param_value": "some message here"
 	    }
 	],
         [
 	    {
-		"param_name": "altitude",
+		"param_key": "altitude",
 		"param_value": "5050"
 	    },
 	    {
-		"param_name": "airspeed",
+		"param_key": "airspeed",
 		"param_value": "321"
 	    },
             {
-                "param_name": "message",
+                "param_key": "message",
                 "param_value": "here here here"
             }
 	]
@@ -414,13 +401,11 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                             "match_condition_type": "ANY",
                             "match_conditions": [
                                {
-                                    "param_name": "$airspeed",
                                     "param_key": "airspeed",
                                     "param_type": "NUM",
                                     "param_match": "NUM > 140"
                                },
                                {
-                                    "param_name": "$altitude",
                                     "param_key": "altitude",
                                     "param_type": "NUM",
                                     "param_match": "NUM > 1000"
@@ -446,7 +431,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                         "match_condition_type": "ANY",
                         "match_conditions": [
                              {
-                                "param_name": "$airspeed",
                                 "param_key": "airspeed",
                                 "param_type": "NUM",
                                 "param_match": "NUM > 1500"
@@ -468,7 +452,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                         "match_condition_type": "ANY",
                         "match_conditions": [
                              {
-                                "param_name": "$message",
                                 "param_key": "message",
                                 "param_type": "STRING",
                                 "param_match": "here"
@@ -490,16 +473,14 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                         "match_condition_type": "ANY",
                         "match_conditions": [
                              {
-                                "param_name": "$airspeed",
                                 "param_key": "airspeed",
                                 "param_type": "NUM",
-                                "param_match": "$airspeed > 500"
+                                "param_match": "NUM > 500"
                              },
                              {
-                                "param_name": "$altitude",
                                 "param_key": "altitude",
                                 "param_type": "NUM",
-                                "param_match": "$altitude > 2000"
+                                "param_match": "NUM > 2000"
                              }
                         ],
                         "match_actions": [
@@ -526,7 +507,7 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
     // bad constants //
     ///////////////////
 
-    // missing unique_id
+    // missing unique_id & wrong name
     pub const BADFLOWSTATE: &str = r#"
 {
     "state_transitions": [
@@ -573,7 +554,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                                     "param_match": "$airspeed > 140"
                                },
                                {
-                                    "param_name": "$altitude",
                                     "param_key": "altitude",
                                     "param_type": "NUM",
                                     "param_match": "$altitude > 1000"
@@ -582,13 +562,11 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                             "match_actions": [
                                 {
                                     "action_key": "dref_1",
-                                    "action_type": "f64",
                                     "action_value": "190"
                                 },
                                 {
                                    "action_key": "dref_2",
-                                  "action_type": "f64",
-                                 "action_value": "5050"
+                                   "action_value": "5050"
                                 }
                            ],
                            "next_available_matches": [
@@ -601,13 +579,11 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                         "match_condition_type": "ANY",
                         "match_conditions": [
                              {
-                                "param_name": "$airspeed",
                                 "param_key": "airspeed",
                                 "param_type": "NUM",
                                 "param_match": "$airspeed > 150"
                              },
                              {
-                                "param_name": "$altitude",
                                 "param_key": "altitude",
                                 "param_type": "NUM",
                                 "param_match": "$altitude > 2000"

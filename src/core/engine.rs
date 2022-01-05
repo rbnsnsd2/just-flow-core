@@ -123,7 +123,7 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
         for (s, state) in input.state_transitions.iter().enumerate() {
             debug!(
                 ">{:?}>{:?} state[0]={:?} being evaluated against routes: {:?}",
-                r, s, state[0].param_name, routes_to_eval
+                r, s, state[0].param_key, routes_to_eval
             );
             let mut action_state = Vec::<Actions>::new();
 
@@ -214,15 +214,12 @@ fn eval_condition_all(conditions: &ConditionMatches, states: &Vec<State>) -> boo
     for cond in conditions.match_conditions.iter() {
         debug!("match_cond: {:?}", cond.param_match);
         for param in states.iter() {
-            debug!("\tparams: {:?}/{:?}", param.param_name, param.param_value);
-            if param.param_name == cond.param_key {
+            debug!("\tparams: {:?}/{:?}", param.param_key, param.param_value);
+            if param.param_key == cond.param_key {
                 debug!("\tparam key match!");
                 bool_results.push(eval_num_string_expression(&cond, &param.param_value));
             } else {
-                debug!(
-                    "\tparam key: {:?} != {:?}",
-                    param.param_name, cond.param_key
-                );
+                debug!("\tparam key: {:?} != {:?}", param.param_key, cond.param_key);
             }
         }
     }

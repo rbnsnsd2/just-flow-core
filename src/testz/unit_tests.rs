@@ -11,7 +11,7 @@ mod tests {
     fn load_state() {
         let state: crate::core::structures::State =
             serde_json::from_str(STATE).expect("unable to convert");
-        println!("param extracted: {:?}", state.param_name);
+        println!("param extracted: {:?}", state.param_key);
         let json: String = serde_json::to_string(&state).unwrap();
         debug!("state to string: {:?}", json);
     }
@@ -44,7 +44,7 @@ mod tests {
     fn config_match_condition() {
         let match_condition: crate::core::structures::MatchCondition =
             serde_json::from_str(MATCHCONDITION).expect("unable to convert");
-        println!("match_condition: {:?}", match_condition.param_name);
+        println!("match_condition: {:?}", match_condition.param_key);
     }
 
     #[test]

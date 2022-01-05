@@ -13,7 +13,7 @@ pub struct FlowState {
 
 #[derive(Serialize, Deserialize)]
 pub struct State {
-    pub param_name: String,
+    pub param_key: String,
     pub param_value: String,
 }
 
@@ -95,7 +95,6 @@ pub struct ConditionMatches {
 
 #[derive(Serialize, Deserialize)]
 pub struct MatchCondition {
-    pub param_name: String,
     pub param_key: String,
     pub param_type: String,
     pub param_match: String,
