@@ -96,8 +96,6 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
         "config: {:?}, flow: {:?}",
         config.version_name, input.unique_id
     );
-    // TODO needs to return ok/err
-
     //
     // ASSUMPTION -- non stateful, so need/expect to iter states
     //
@@ -119,6 +117,9 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
         //
         let route_name_index = build_route_name_index(route);
         let mut routes_to_eval = vec!["START".to_string()];
+
+        // This is the temporary vec of result from evaluating all states in given flow
+        let mut temp_action_transitions = Vec::<Vec<Actions>>::new();
 
         for (s, state) in input.state_transitions.iter().enumerate() {
             debug!(
@@ -146,7 +147,9 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
                         Some(&ind) => {
                             debug!("add actions index: {:?}", ind);
                             for action in route.flow_conditional_matches[ind].match_actions.iter() {
-                                action_state.push(action.clone());
+                                if action.action_value != "NULL" {
+                                    action_state.push(action.clone());
+                                };
                             }
                         }
                         None => {}
@@ -183,9 +186,14 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
             debug!("action_state len: {:?}", action_state.len());
             // don't add a vector unless there is a non-zero
             if action_state.len() >= 1 {
-                action_transitions.push(action_state);
+                temp_action_transitions.push(action_state);
             };
         } // end of stateloop
+          // take the last instruction from the single routeloop
+        match temp_action_transitions.last() {
+            Some(result) => action_transitions.push(result.to_vec()),
+            None => debug!("temp_action_transitions.last() returned"),
+        };
         debug!("action_transitions len: {:?}", action_transitions.len());
     } // end of flowrouteloop
     Ok(action_transitions)
