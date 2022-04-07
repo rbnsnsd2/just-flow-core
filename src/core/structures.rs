@@ -69,7 +69,7 @@ pub struct Actions {
 
 impl Actions {
     pub fn null_state() -> Actions {
-        Action {
+        Actions {
             action_key: "NULL".to_string(),
             action_value: "NULL".to_string(),
         }
