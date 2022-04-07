@@ -24,7 +24,7 @@ pub struct State {
 pub struct ActionState {
     pub unique_id: String,
     pub action_transitions: Vec<Vec<Actions>>,
-}
+} // end ActionState
 
 impl fmt::Display for ActionState {
     #[allow(unused_variables)]
@@ -36,7 +36,7 @@ impl fmt::Display for ActionState {
         };
         write!(f, "{}", json)
     }
-}
+} // end ActionState display
 
 impl ActionState {
     #[allow(dead_code)]
@@ -59,13 +59,22 @@ impl ActionState {
             }]],
         }
     }
-}
+} // end ActionState impl
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Actions {
     pub action_key: String,
     pub action_value: String,
 }
+
+impl Actions {
+    pub fn null_state() -> Actions {
+        Action {
+            action_key: "NULL".to_string(),
+            action_value: "NULL".to_string(),
+        }
+    } // end null_state
+} // end Actions impl
 
 ////////////////////
 // CONFIG PAYLOAD //
