@@ -1,5 +1,6 @@
 //src/core/structures.rs
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fmt;
 
 ///////////////////
@@ -23,7 +24,7 @@ pub struct State {
 #[derive(Serialize, Deserialize)]
 pub struct ActionState {
     pub unique_id: String,
-    pub action_transitions: Vec<Vec<Actions>>,
+    pub action_transitions: HashMap<String, Vec<Vec<Actions>>>,
 } // end ActionState
 
 impl fmt::Display for ActionState {
@@ -41,27 +42,37 @@ impl fmt::Display for ActionState {
 impl ActionState {
     #[allow(dead_code)]
     pub fn empty() -> ActionState {
-        ActionState {
-            unique_id: "test_empty".to_string(),
-            action_transitions: vec![vec![Actions {
+        let mut trans: HashMap<String, Vec<Vec<Actions>>> = HashMap::new();
+        trans.insert(
+            "test_empty".to_string(),
+            vec![vec![Actions {
                 action_key: "test_action_key".to_string(),
                 action_value: "test_action_value".to_string(),
             }]],
+        );
+        ActionState {
+            unique_id: "test_empty".to_string(),
+            action_transitions: trans,
         }
     }
 
     pub fn error(error_message: String) -> ActionState {
-        ActionState {
-            unique_id: error_message,
-            action_transitions: vec![vec![Actions {
+        let mut trans: HashMap<String, Vec<Vec<Actions>>> = HashMap::new();
+        trans.insert(
+            "error_flow".to_string(),
+            vec![vec![Actions {
                 action_key: "error_action_key".to_string(),
                 action_value: "error_action_value".to_string(),
             }]],
+        );
+        ActionState {
+            unique_id: error_message,
+            action_transitions: trans,
         }
     }
 } // end ActionState impl
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Actions {
     pub action_key: String,
     pub action_value: String,
@@ -82,7 +93,7 @@ impl Actions {
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     pub version_name: String,
-    pub stateful: bool,
+    // pub stateful: bool,
     pub flow_routes: Vec<RouteFlow>,
 }
 
@@ -95,7 +106,7 @@ pub struct RouteFlow {
 #[derive(Serialize, Deserialize)]
 pub struct ConditionMatches {
     pub route_condition_name: String,
-    pub match_type: String,
+    // pub match_type: String,
     pub match_condition_type: String,
     pub match_conditions: Vec<MatchCondition>,
     pub match_actions: Vec<Actions>,

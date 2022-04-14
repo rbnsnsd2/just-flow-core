@@ -12,34 +12,18 @@ use log::{debug, error};
 //     // a function to say hello form src/core/engine.rs
 //     debug!("engine_hello started");
 //     println!("avalue here: {}", AVALUE);
-//     println!("engine_hello from src/core/engine.rs");
+//     println!("engine_hello from src/core/engines");
 // }
 
 pub fn load_flow_state(input: String) -> Result<FlowState, serde_json::Error> {
     debug!("load_flow_state");
-    // TODO needs to return ok/err
     let flow_state = serde_json::from_str(&input);
-    // let flow_state = match flow_state {
-    //     Ok(flow) => flow,
-    //     Err(error) => {
-    //         error!("error from input: {:?} with error: {:?}", &input, &error);
-    //         panic!("Flow state is incorrectly formatted: {:?}", error);
-    //     }
-    // };
     flow_state
 }
 
 pub fn load_config(input: String) -> Result<Config, serde_json::Error> {
     debug!("load_config");
-    // TODO needs to return ok/err
     let config = serde_json::from_str(&input);
-    // let config = match config {
-    //     Ok(flow) => flow,
-    //     Err(error) => {
-    //         error!("error from config: {:?} with error: {:?}", &input, &error);
-    //         panic!("Config is incorrectly formatted: {:?}", error);
-    //     }
-    // };
     config
 }
 
@@ -51,6 +35,7 @@ pub fn process(config: String, input: String) -> String {
     //
     let config = crate::core::engine::load_config(config);
     let input = crate::core::engine::load_flow_state(input);
+    // TODO load the config first as a separate step
 
     if config.is_ok() && input.is_ok() {
         debug!(
@@ -61,7 +46,8 @@ pub fn process(config: String, input: String) -> String {
         let uinput = input.unwrap();
         let uid = uinput.unique_id.clone();
         let actions = evaluate(&config.unwrap(), uinput);
-        // let actions = evaluate(&config.unwrap(), input.unwrap());
+
+        // handle the error cases
         if actions.is_err() {
             return ActionState::error("error during evaluation".to_string()).to_string();
         }
@@ -91,7 +77,10 @@ pub fn process(config: String, input: String) -> String {
     }
 }
 
-pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, String> {
+pub fn evaluate(
+    config: &Config,
+    input: FlowState,
+) -> Result<HashMap<String, Vec<Vec<Actions>>>, String> {
     debug!(
         "config: {:?}, flow: {:?}",
         config.version_name, input.unique_id
@@ -104,7 +93,7 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
     //    conditions for conditions in
 
     // This is the actions that result from evaluating all states given
-    let mut action_transitions = Vec::<Vec<Actions>>::new();
+    let mut action_transitions: HashMap<String, Vec<Vec<Actions>>> = HashMap::new();
 
     for (r, route) in config.flow_routes.iter().enumerate() {
         debug!(">{:?} flow_route_name: {:?}", r, route.flow_route_name);
@@ -116,23 +105,39 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
         // We also need a hashmap of the route name > index
         //
         let route_name_index = build_route_name_index(route);
-        let mut routes_to_eval = vec!["START".to_string()];
+        let mut routes_to_eval = vec!["START".to_string()]; // set of next available routes
 
         // This is the temporary vec of result from evaluating all states in given flow
         let mut temp_action_transitions = Vec::<Vec<Actions>>::new();
 
+        // here we are iterating over the input states
+        // the output will be the same length as the input sequence with null
+        // entries between state transitions
         for (s, state) in input.state_transitions.iter().enumerate() {
             debug!(
                 ">{:?}>{:?} state[0]={:?} being evaluated against routes: {:?}",
                 r, s, state[0].param_key, routes_to_eval
             );
             let mut action_state = Vec::<Actions>::new();
+            let mut route_loop_result: bool = false;
 
+            // iter over the available next nodes
             'routeloop: for (e, eval_route) in routes_to_eval.iter().enumerate() {
-                debug!(">{:?}>{:?}>{:?} routeloop: {:?}", r, s, e, eval_route);
+                debug!(
+                    ">{:?}>{:?}>{:?} routeloop: {:?}, result: {:?}",
+                    r, s, e, eval_route, route_loop_result
+                );
                 let index = route_name_index.get(&eval_route.to_string());
 
-                let result = match index {
+                // does the state match all the conditions for a transition
+                // let result = match index {
+                //     Some(&ind) => eval_condition_all(&route.flow_conditional_matches[ind], state),
+                //     None => {
+                //         debug!("RESULT: none");
+                //         false
+                //     }
+                // };
+                route_loop_result = match index {
                     Some(&ind) => eval_condition_all(&route.flow_conditional_matches[ind], state),
                     None => {
                         debug!("RESULT: none");
@@ -140,16 +145,19 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
                     }
                 };
 
-                if result == true {
+                // if the state meets the conditions write the action_value
+                // to the output
+                if route_loop_result == true {
                     debug!("result from eval_condition_all: true -> updating routes_to_eval");
                     // add actions
                     match index {
                         Some(&ind) => {
                             debug!("add actions index: {:?}", ind);
                             for action in route.flow_conditional_matches[ind].match_actions.iter() {
-                                if action.action_value != "NULL" {
-                                    action_state.push(action.clone());
-                                };
+                                // if action.action_value != "NULL" {
+                                //     action_state.push(action.clone());
+                                // };
+                                action_state.push(action.clone());
                             }
                         }
                         None => {}
@@ -161,7 +169,11 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
                             debug!("<{:?}<{:?}<{:?} break from poproutesloop", r, s, e);
                             break 'poproutesloop;
                         }
-                    }
+                    } // end poproutesloop
+
+                    // since the conditions were met, we need to move the
+                    // next_available_matches
+                    // index for route_names_index
                     if let Some(&ind) = index {
                         debug!(
                             "new route: {:?}",
@@ -183,17 +195,34 @@ pub fn evaluate(config: &Config, input: FlowState) -> Result<Vec<Vec<Actions>>, 
                     break 'routeloop;
                 };
             } // end of routeloop
+
+            // if at the end of the route_loop the result is still null
+            // push a null_state
+            debug!("route_loop_result: {}", route_loop_result);
+            if route_loop_result == false {
+                action_state.push(Actions::null_state());
+            };
+
+            // don't add the action_state vector
+            // unless there is a non-zero
             debug!("action_state len: {:?}", action_state.len());
-            // don't add a vector unless there is a non-zero
             if action_state.len() >= 1 {
                 temp_action_transitions.push(action_state);
             };
         } // end of stateloop
-          // take the last instruction from the single routeloop
-        match temp_action_transitions.last() {
-            Some(result) => action_transitions.push(result.to_vec()),
-            None => debug!("temp_action_transitions.last() returned"),
-        };
+
+        // use all of the action_states such that the len of the ouput
+        // is the same as input
+        // for act in temp_action_transitions.iter() {
+        //     action_transitions.push(act.clone());
+        // }
+        action_transitions.insert(route.flow_route_name.clone(), temp_action_transitions);
+
+        // // take the last instruction from the single routeloop
+        // match temp_action_transitions.last() {
+        //     Some(_result) => action_transitions.push(_result.to_vec()),
+        //     None => debug!("temp_action_transitions.last() returned"),
+        // };
         debug!("action_transitions len: {:?}", action_transitions.len());
     } // end of flowrouteloop
     Ok(action_transitions)

@@ -1,6 +1,6 @@
 [package]
 name = "just-flow"
-version = "0.1.1"
+version = "0.2.2"
 authors = ["Saul D Robinson <saul@fraignanalytics.com>"]
 edition = "2018"
 publish = false

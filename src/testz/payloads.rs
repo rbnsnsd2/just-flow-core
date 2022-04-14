@@ -2,7 +2,7 @@
 pub mod values {
     pub const AVALUE: &str = "a test string";
 
-    pub const VERSION: &str = "0.1.1";
+    pub const VERSION: &str = "0.2.2";
 
     pub const HELP: &str = r#"
 *** Just-flow-core © 2022 ***
@@ -59,14 +59,12 @@ actions for each automata. An automata defining the first two of these states
 
 {
     "version_name": "uniqueIdString",
-    "stateful": false,
     "flow_routes": [
         {
             "flow_route_name": "help demonstration",
             "flow_conditional_matches": [
                 {
                     "route_condition_name": "START",
-                    "match_type": "START",
                     "match_condition_type": "ANY",
                     "match_conditions": [
                         {
@@ -96,7 +94,6 @@ actions for each automata. An automata defining the first two of these states
                },
                {
                    "route_condition_name": "climb",
-                   "match_type": "EVAL",
                    "match_condition_type": "ANY",
                    "match_conditions": [
                        {
@@ -168,12 +165,6 @@ H        420    1500   2500   1500   600
 	]
     ]
 }
-
-Config notes:
-"stateful" is currently only accepted as "false". Note that this should be 
-passed as a correctly formatted json, so this is not False or "False" (in quotes).
-When using python: json.dumps('{"stateful": False}') returns the correct result.
-
     "#;
 
     pub const STATE: &str = r#"
@@ -220,28 +211,30 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
     pub const ACTIONSTATE: &str = r#"
          {
             "unique_id": "someuuid",
-            "action_transitions": [
-                [
-                    {
-                        "action_key": "dref val 1",
-                        "action_value": "2222"
-                    },
-                    {
-                        "action_key": "dref val 1",
-                        "action_value": "2222"
-                    }
-                ],
-                [
-                    {
-                        "action_key": "dref val 1",
-                        "action_value": "2222"
-                    },
-                    {
-                        "action_key": "dref val 1",
-                        "action_value": "2222"
-                    }
+            "action_transitions": {
+                "first_route": [
+                    [
+                        {
+                            "action_key": "dref val 1",
+                            "action_value": "2222"
+                        },
+                        {
+                            "action_key": "dref val 1",
+                            "action_value": "2222"
+                        }
+                    ],
+                    [
+                        {
+                            "action_key": "dref val 1",
+                            "action_value": "2222"
+                        },
+                        {
+                            "action_key": "dref val 1",
+                            "action_value": "2222"
+                        }
+                    ]
                 ]
-             ]
+            }
         }
         "#;
 
@@ -256,7 +249,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
     pub const CONDITIONMATCHES: &str = r#"
         {
             "route_condition_name": "START",
-            "match_type": "START",
             "match_condition_type": "ANY",
             "match_conditions": [
                 {
@@ -291,7 +283,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
             "flow_conditional_matches": [
                 {
                     "route_condition_name": "takeoff_1",
-                    "match_type": "START",
                     "match_condition_type": "ANY",
                     "match_conditions": [
                         {
@@ -321,7 +312,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                 },
                 {
                     "route_condition_name": "takeoff_climb_1",
-                    "match_type": "EVAL",
                     "match_condition_type": "ANY",
                     "match_conditions": [
                         {
@@ -390,14 +380,12 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
     pub const CONFIG: &str = r#"
         {
             "version_name": "version2",
-            "stateful": false,
             "flow_routes": [
                 {
                     "flow_route_name": "first flow route",
                     "flow_conditional_matches": [
                         {
                             "route_condition_name": "START",
-                            "match_type": "START",
                             "match_condition_type": "ANY",
                             "match_conditions": [
                                {
@@ -427,7 +415,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                     },
                     {
                         "route_condition_name": "takeoff_climb_1",
-                        "match_type": "EVAL",
                         "match_condition_type": "ANY",
                         "match_conditions": [
                              {
@@ -448,7 +435,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                     },
                     {
                         "route_condition_name": "emergency_1",
-                        "match_type": "EVAL",
                         "match_condition_type": "ANY",
                         "match_conditions": [
                              {
@@ -469,7 +455,6 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                     },
                     {
                         "route_condition_name": "takeoff_climb_2",
-                        "match_type": "EVAL",
                         "match_condition_type": "ANY",
                         "match_conditions": [
                              {
@@ -495,6 +480,60 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
                         ],
                         "next_available_matches": [
                             "END", "emergency_1"
+                        ]
+                    }
+                ]
+          },
+               {
+                    "flow_route_name": "second flow route",
+                    "flow_conditional_matches": [
+                        {
+                            "route_condition_name": "START",
+                            "match_condition_type": "ANY",
+                            "match_conditions": [
+                               {
+                                    "param_key": "airspeed",
+                                    "param_type": "NUM",
+                                    "param_match": "NUM > 140"
+                               },
+                               {
+                                    "param_key": "altitude",
+                                    "param_type": "NUM",
+                                    "param_match": "NUM > 1000"
+                               }
+                            ],
+                            "match_actions": [
+                                {
+                                    "action_key": "dref_1",
+                                    "action_value": "190"
+                                },
+                                {
+                                    "action_key": "message",
+                                    "action_value": "second route: this action should be triggered by the example flow"
+                                }
+                           ],
+                           "next_available_matches": [
+                               "takeoff_climb_1"
+                           ]
+                    },
+                    {
+                        "route_condition_name": "takeoff_climb_1",
+                        "match_condition_type": "ANY",
+                        "match_conditions": [
+                             {
+                                "param_key": "airspeed",
+                                "param_type": "NUM",
+                                "param_match": "NUM > 1500"
+                             }
+                        ],
+                        "match_actions": [
+                            {
+                                "action_key": "action_message",
+                                "action_value": "second route: this action should NOT be triggered! 1500kts is fast!"
+                            }
+                        ],
+                        "next_available_matches": [
+                            "END"
                         ]
                     }
                 ]
@@ -538,14 +577,12 @@ When using python: json.dumps('{"stateful": False}') returns the correct result.
     pub const BADCONFIG: &str = r#"
         {
             "version_name": "version1",
-            "stateful": false,
             "flow_routes": [
                 {
                     "flow_route_name": "evaluate entire event flow",
                     "flow_conditional_matches": [
                         {
                             "route_condition_name": "START",
-                            "match_type": "START",
                             "match_condition_type": "ANY",
                             "match_conditions": [
                                {

@@ -34,10 +34,14 @@ mod tests {
     fn output_action_state() {
         let action_state: crate::core::structures::ActionState =
             serde_json::from_str(ACTIONSTATE).expect("unable to convert");
-        println!(
-            "action_state: {:?}",
-            action_state.action_transitions[0][0].action_key
-        );
+        println!("action_state: {:?}", action_state.action_transitions);
+    }
+
+    #[test]
+    fn output_actions_null_state() {
+        let actions: crate::core::structures::Actions =
+            crate::core::structures::Actions::null_state();
+        println!("actions::null_state: {:?}", actions);
     }
 
     #[test]
